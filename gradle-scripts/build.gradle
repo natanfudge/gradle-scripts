@@ -1,0 +1,18 @@
+Properties properties = new Properties()
+File propertiesFile = new File('gradle.properties')
+propertiesFile.withInputStream {
+    properties.load(it)
+}
+task updateTemplate(type: Copy) {
+    group = "template"
+    description = "Switches out gradle.properties variables like \$mod_version in .template.md files, and copies the results into .md files."
+    from(rootDir)
+    include("**/*.template.md")
+    filesMatching("**/*.template.md") {
+        def extensionLength = ".template.md".length()
+
+        name = sourceName.substring(0, sourceName.length() - extensionLength) + ".md"
+        expand(properties)
+    }
+    destinationDir = rootDir
+}
